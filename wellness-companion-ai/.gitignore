@@ -1,0 +1,171 @@
+# wellness-companion-ai/.gitignore
+
+# === ENVIRONMENT & SECRETS ===
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.key
+*.crt
+*.p12
+
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# === VIRTUAL ENVIRONMENTS ===
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# === DOCKER ===
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# === DATABASES ===
+*.db
+*.sqlite3
+postgres_data/
+redis_data/
+qdrant_data/
+
+# === AI/ML MODELS ===
+models/
+*.model
+*.pkl
+*.joblib
+ollama_models/
+embeddings_cache/
+model_cache/
+
+# === LOGS ===
+*.log
+logs/
+nginx_logs/
+*.out
+*.err
+
+# === IDE & EDITORS ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# === JUPYTER NOTEBOOKS ===
+.ipynb_checkpoints/
+*.ipynb
+
+# === TESTING ===
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# === NODE.JS (if any frontend tools) ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === AWS ===
+.aws/
+aws-exports.js
+
+# === CERTIFICATES & KEYS ===
+ssl/
+certs/
+*.pem
+*.key
+*.crt
+
+# === BACKUP FILES ===
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# === SYSTEM FILES ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# === APPLICATION SPECIFIC ===
+uploads/
+downloads/
+cache/
+temp/
+.cache/
+
+# === BRIEFCASE BUILD OUTPUTS ===
+services/desktop-app/dist/
+services/desktop-app/build/
+*.dmg
+*.exe
+*.deb
+*.rpm
+*.msi
+
+# === PYTEST ===
+.pytest_cache/
+tests/.pytest_cache/
+
+# === MYPY ===
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# === TERRAFORM ===
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# === MONITORING DATA ===
+prometheus_data/
+grafana_data/
+elasticsearch_data/
+
+# === LOCAL DEVELOPMENT ===
+.local/
+local_settings.py
+development.yml
