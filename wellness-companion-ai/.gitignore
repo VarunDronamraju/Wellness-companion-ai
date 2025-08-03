@@ -169,3 +169,7 @@ elasticsearch_data/
 .local/
 local_settings.py
 development.yml
+
+# Parent directory exclusions
+../Documents/
+../FLOWTESTS/

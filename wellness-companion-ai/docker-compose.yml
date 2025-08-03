@@ -1,7 +1,3 @@
-# wellness-companion-ai/docker-compose.yml
-# TASK 2: Complete Docker Compose Configuration for All 6 Services
-
-version: '3.8'
 
 networks:
   wellness_network:
@@ -17,9 +13,9 @@ volumes:
 services:
   # === LAYER 5: Infrastructure Services ===
   
-  # PostgreSQL Database
+  # PostgreSQL Database with pgvector
   postgres:
-    image: postgres:15-alpine
+    image: ankane/pgvector:latest
     container_name: wellness_postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -58,11 +54,14 @@ services:
 
   # Qdrant Vector Database
   qdrant:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:v1.7.4
     container_name: wellness_qdrant
     environment:
       QDRANT__SERVICE__HTTP_PORT: 6333
       QDRANT__SERVICE__GRPC_PORT: 6334
+      QDRANT__LOG_LEVEL: INFO
+      QDRANT__SERVICE__ENABLE_CORS: true
+      QDRANT__CLUSTER__ENABLED: false
     volumes:
       - qdrant_data:/qdrant/storage
     ports:
@@ -70,18 +69,25 @@ services:
       - "6334:6334"
     networks:
       - wellness_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
 
   # Ollama Local LLM
   ollama:
     image: ollama/ollama:latest
     container_name: wellness_ollama
     environment:
-      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_HOST: 0.0.0.0
+      OLLAMA_PORT: 11434
+      OLLAMA_ORIGINS: "*"
+      OLLAMA_MODELS: /root/.ollama/models
+      OLLAMA_KEEP_ALIVE: 5m
+      OLLAMA_DEBUG: false
     volumes:
       - ollama_models:/root/.ollama
     ports:
@@ -91,8 +97,10 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
       interval: 30s
-      timeout: 10s
+      timeout: 15s
       retries: 5
+      start_period: 60s
+    restart: unless-stopped
 
   # === LAYER 4: Data Management Service ===
   
@@ -105,25 +113,16 @@ services:
       POSTGRES_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       QDRANT_URL: http://qdrant:6333
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      qdrant:
-        condition: service_healthy
+      - postgres
+      - redis
+      - qdrant
     ports:
       - "8002:8000"
     networks:
       - wellness_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    restart: unless-stopped
 
   # === LAYER 3: AI/ML Orchestration Service ===
   
@@ -139,12 +138,9 @@ services:
       DATA_LAYER_URL: http://data-layer:8000
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
     depends_on:
-      ollama:
-        condition: service_healthy
-      qdrant:
-        condition: service_healthy
-      data-layer:
-        condition: service_healthy
+      - ollama
+      - qdrant
+      - data-layer
     ports:
       - "8001:8000"
     networks:
@@ -154,6 +150,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
   # === LAYER 2: Core Backend Service ===
   
@@ -167,75 +164,61 @@ services:
       AIML_SERVICE_URL: http://aiml-orchestration:8000
       DATA_LAYER_URL: http://data-layer:8000
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      AWS_COGNITO_USER_POOL_ID: ${AWS_COGNITO_USER_POOL_ID}
-      AWS_COGNITO_CLIENT_ID: ${AWS_COGNITO_CLIENT_ID}
     depends_on:
-      redis:
-        condition: service_healthy
-      aiml-orchestration:
-        condition: service_healthy
-      data-layer:
-        condition: service_healthy
+      - redis
+      - aiml-orchestration
+      - data-layer
     ports:
       - "8000:8000"
     networks:
       - wellness_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    restart: unless-stopped
 
-  # === LAYER 5: NGINX API Gateway ===
+  # === LAYER 5: NGINX API Gateway (Disabled for Current Stage) ===
   
-  nginx:
-    build:
-      context: ./services/infrastructure/docker/nginx
-      dockerfile: Dockerfile
-    container_name: wellness_nginx
-    environment:
-      BACKEND_URL: http://core-backend:8000
-    volumes:
-      - nginx_logs:/var/log/nginx
-      - ./services/infrastructure/docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./services/infrastructure/docker/nginx/api_gateway.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      core-backend:
-        condition: service_healthy
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - wellness_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  # nginx:
+  #   build:
+  #     context: ./services/infrastructure/docker/nginx
+  #     dockerfile: Dockerfile
+  #   container_name: wellness_nginx
+  #   environment:
+  #     BACKEND_URL: http://core-backend:8000
+  #   volumes:
+  #     - nginx_logs:/var/log/nginx
+  #     - ./services/infrastructure/docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./services/infrastructure/docker/nginx/api_gateway.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - core-backend
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   networks:
+  #     - wellness_network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
 
   # === DEVELOPMENT SERVICES ===
   
-  # Desktop App (Development Mode)
-  desktop-app:
-    build:
-      context: ./services/desktop-app
-      dockerfile: Dockerfile
-    container_name: wellness_desktop
-    environment:
-      BACKEND_URL: http://nginx:80
-      DISPLAY: ${DISPLAY:-:0}
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ./services/desktop-app/src:/app/src
-    depends_on:
-      nginx:
-        condition: service_healthy
-    networks:
-      - wellness_network
-    profiles:
-      - development
+  # desktop-app:
+  #   build:
+  #     context: ./services/desktop-app
+  #     dockerfile: Dockerfile
+  #   container_name: wellness_desktop
+  #   environment:
+  #     BACKEND_URL: http://nginx:80
+  #     DISPLAY: ${DISPLAY:-:0}
+  #   volumes:
+  #     - /tmp/.X11-unix:/tmp/.X11-unix:rw
+  #     - ./services/desktop-app/src:/app/src
+  #   depends_on:
+  #     - nginx
+  #   networks:
+  #     - wellness_network
+  #   profiles:
+  #     - development
 
   # === MONITORING & LOGGING ===
   

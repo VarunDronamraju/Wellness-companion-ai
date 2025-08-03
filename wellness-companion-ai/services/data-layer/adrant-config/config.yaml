@@ -1,0 +1,63 @@
+# services/data-layer/qdrant-config/config.yaml
+# Qdrant Configuration for Wellness Companion AI
+
+service:
+  http_port: 6333
+  grpc_port: 6334
+  enable_cors: true
+  
+storage:
+  # Performance optimizations
+  optimizers:
+    # Threshold for using memory-mapped files
+    memmap_threshold_kb: 200000
+    # Threshold for indexing optimization
+    indexing_threshold_kb: 20000
+    # Deleted vectors cleanup threshold
+    deleted_threshold: 0.2
+    # Vacuum minimum vector count
+    vacuum_min_vector_number: 1000
+    # Default segment number
+    default_segment_number: 0
+    # Max segment size in KB
+    max_segment_size_kb: 20000000
+    # Memmap threshold for payload index
+    memmap_threshold_payload_kb: 20000
+    # Indexing threshold for payload
+    indexing_threshold_payload_kb: 10000
+    # Flush interval in seconds
+    flush_interval_sec: 5
+    # Max optimization threads
+    max_optimization_threads: 1
+
+  # WAL (Write-Ahead Logging) configuration
+  wal:
+    # WAL capacity in MB
+    wal_capacity_mb: 32
+    # WAL segments count
+    wal_segments_ahead: 0
+
+  # Performance settings
+  performance:
+    # Max search results
+    max_search_results: 10000
+
+# Cluster configuration (disabled for single node)
+cluster:
+  enabled: false
+
+# Security configuration
+security:
+  # Enable API key authentication (set via environment)
+  # api_key: set via QDRANT_API_KEY environment variable
+
+# Telemetry settings
+telemetry:
+  # Disable telemetry for privacy
+  disabled: true
+
+# Debug settings
+debug: false
+
+# Log level
+log_level: "INFO"
