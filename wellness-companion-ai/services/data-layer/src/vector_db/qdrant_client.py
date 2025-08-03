@@ -164,3 +164,23 @@ class DataLayerQdrantClient:
         except Exception as e:
             logger.error(f"Failed to delete vectors: {str(e)}")
             return False
+    def get_collection_info(self, collection_name: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrieve information/stats about a specific collection.
+        
+        Args:
+            collection_name: Name of the collection
+            
+        Returns:
+            Dict with collection details or None
+        """
+        if not self.connected and not self.connect():
+            raise ConnectionError("Not connected to Qdrant")
+        
+        try:
+            collection_info = self.client.get_collection(collection_name=collection_name)
+            logger.info(f"Fetched info for collection: {collection_name}")
+            return collection_info.dict()
+        except Exception as e:
+            logger.error(f"Failed to get collection info for {collection_name}: {str(e)}")
+            return None
