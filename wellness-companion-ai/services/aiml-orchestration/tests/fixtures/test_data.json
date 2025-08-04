@@ -1,0 +1,82 @@
+
+{
+  "test_queries": [
+    {
+      "query": "What is machine learning?",
+      "expected_intent": "explain",
+      "expected_keywords": ["machine", "learning"],
+      "difficulty": "easy"
+    },
+    {
+      "query": "How do neural networks work in deep learning systems?",
+      "expected_intent": "explain",
+      "expected_keywords": ["neural", "networks", "deep", "learning"],
+      "difficulty": "medium"
+    },
+    {
+      "query": "Compare supervised and unsupervised learning algorithms",
+      "expected_intent": "compare",
+      "expected_keywords": ["supervised", "unsupervised", "learning", "algorithms"],
+      "difficulty": "hard"
+    },
+    {
+      "query": "Find research papers about transformer architectures",
+      "expected_intent": "search",
+      "expected_keywords": ["research", "papers", "transformer", "architectures"],
+      "difficulty": "medium"
+    }
+  ],
+  "test_documents": [
+    {
+      "id": "doc1",
+      "content": "Machine learning is a subset of artificial intelligence that enables computers to learn and make decisions without being explicitly programmed. It uses algorithms to analyze data, identify patterns, and make predictions.",
+      "source": "AI Textbook Chapter 1",
+      "relevance_score": 0.95
+    },
+    {
+      "id": "doc2", 
+      "content": "Deep learning is a specialized subset of machine learning that uses neural networks with multiple layers to process and learn from large amounts of data. It has revolutionized fields like computer vision and natural language processing.",
+      "source": "Deep Learning Guide",
+      "relevance_score": 0.88
+    },
+    {
+      "id": "doc3",
+      "content": "Supervised learning algorithms learn from labeled training data to make predictions on new, unseen data. Examples include linear regression, decision trees, and support vector machines.",
+      "source": "ML Algorithms Reference",
+      "relevance_score": 0.82
+    }
+  ],
+  "test_scenarios": [
+    {
+      "name": "high_confidence_scenario",
+      "query": "What is machine learning?",
+      "expected_confidence": 0.8,
+      "expected_fallback": false,
+      "mock_search_results": ["doc1", "doc2"],
+      "expected_sources": 2
+    },
+    {
+      "name": "low_confidence_scenario", 
+      "query": "Obscure technical question about quantum computing",
+      "expected_confidence": 0.3,
+      "expected_fallback": true,
+      "mock_search_results": [],
+      "expected_sources": 0
+    },
+    {
+      "name": "medium_confidence_scenario",
+      "query": "How does deep learning work?",
+      "expected_confidence": 0.6,
+      "expected_fallback": false,
+      "mock_search_results": ["doc2"],
+      "expected_sources": 1
+    }
+  ],
+  "performance_benchmarks": {
+    "max_response_time": 30.0,
+    "target_response_time": 2.0,
+    "min_confidence_threshold": 0.7,
+    "max_token_limit": 4000,
+    "batch_processing_limit": 10
+  }
+}
