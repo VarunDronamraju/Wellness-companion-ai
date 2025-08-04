@@ -1,0 +1,27 @@
+{
+  "tavily_response": {
+    "answer": "Python is a versatile programming language",
+    "results": [
+      {
+        "title": "Python Tutorial - W3Schools",
+        "url": "https://www.w3schools.com/python/",
+        "content": "Python is a popular programming language. It was created by Guido van Rossum, and released in 1991.",
+        "score": 0.95
+      },
+      {
+        "title": "Learn Python - Python.org",
+        "url": "https://www.python.org/about/gettingstarted/",
+        "content": "Python is an interpreted, object-oriented, high-level programming language with dynamic semantics.",
+        "score": 0.88
+      }
+    ]
+  },
+  "local_results": [
+    {
+      "title": "Python Basics Document",
+      "content": "Python programming fundamentals and syntax overview",
+      "score": 0.92,
+      "document_id": "doc_123"
+    }
+  ]
+}
