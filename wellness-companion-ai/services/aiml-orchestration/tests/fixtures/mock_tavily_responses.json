@@ -1,0 +1,27 @@
+{
+  "successful_response": {
+    "results": [
+      {
+        "title": "Machine Learning Trends 2025",
+        "url": "https://example.com/ml-trends-2025",
+        "content": "The latest machine learning trends include transformer architectures, few-shot learning, and edge AI deployment. These technologies are reshaping how we approach artificial intelligence applications.",
+        "snippet": "Latest ML trends include transformers and edge AI...",
+        "score": 0.92
+      },
+      {
+        "title": "AI Research Breakthroughs",
+        "url": "https://research.example.com/ai-breakthroughs",
+        "content": "Recent breakthroughs in artificial intelligence research include improved natural language processing, computer vision advances, and more efficient training methods.",
+        "snippet": "AI research breakthroughs in NLP and computer vision...",
+        "score": 0.88
+      }
+    ],
+    "query": "machine learning trends 2025",
+    "response_time": 0.45
+  },
+  "empty_response": {
+    "results": [],
+    "query": "very obscure technical term",
+    "response_time": 0.23
+  }
+}

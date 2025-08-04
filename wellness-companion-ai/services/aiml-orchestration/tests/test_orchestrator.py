@@ -11,11 +11,11 @@ import sys
 
 sys.path.append('/app/src')
 
-from orchestrators.query_processor import QueryProcessor, QueryAnalysis
-from orchestrators.context_builder import ContextBuilder, AssembledContext
-from orchestrators.response_synthesizer import ResponseSynthesizer
-from orchestrators.workflow_manager import WorkflowManager
-from reranking.confidence_scorer import ConfidenceScorer
+from src.orchestrators.query_processor import QueryProcessor, QueryAnalysis
+from src.orchestrators.context_builder import ContextBuilder, AssembledContext
+from src.orchestrators.response_synthesizer import ResponseSynthesizer
+from src.orchestrators.workflow_manager import WorkflowManager
+from src.reranking.confidence_scorer import ConfidenceScorer
 
 class TestOrchestrators(unittest.TestCase):
     """Test orchestrator components."""

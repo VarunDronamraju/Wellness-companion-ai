@@ -14,6 +14,15 @@ from .context_builder import ContextBuilder, AssembledContext
 from .prompt_formatter import PromptFormatter
 from .pipeline_coordinator import PipelineCoordinator, PipelineStage
 from .workflow_manager import WorkflowManager, WorkflowStatus
+from .hybrid_search import HybridSearch
+from .search_strategy import SearchStrategy,SearchType
+from .confidence_evaluator import ConfidenceEvaluator
+from .fallback_manager import FallbackManager
+from .search_coordinator import SearchCoordinator
+from .result_merger import ResultMerger
+from .result_synthesizer import ResultSynthesizer
+from content_combiner import ContentCombiner
+from source_attribution import SourceAttribution
 
 __all__ = [
     'RAGOrchestrator',
@@ -30,6 +39,17 @@ __all__ = [
     'PipelineCoordinator',
     'PipelineStage',
     'WorkflowManager',
-    'WorkflowStatus'
+    'WorkflowStatus',
+    'HybridSearch',
+    'SearchStrategy',
+    'SearchType',
+    'ConfidenceEvaluator',
+    'FallbackManager',
+    'SearchCoordinator',
+    'ResultSynthesizer',
+    'ResultMerger',
+    'ContentCombiner',
+    'SourceAttribution'
+
 ]
         

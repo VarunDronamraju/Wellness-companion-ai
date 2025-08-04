@@ -14,6 +14,11 @@ from . result_validator import  ResultValidator
 from .result_parser import ResultParser
 from .content_extractor import ContentExtractor
 from .web_result_processor import WebResultProcessor
+from .web_search import WebSearchClient, WebSearchResult
+from .tavily_client import TavilyClient
+from .web_search_config import WebSearchConfig
+from .api_rate_limiter import APIRateLimiter
+from .search_request_builder import SearchRequestBuilder
 __all__ = [
     'QdrantClientManager',
     'VectorDBConfig',
@@ -25,5 +30,11 @@ __all__ = [
     'ResultValidator',
     'ContentExtractor',
     'ResultParser',
-    'WebResultProcessor'
+    'WebResultProcessor',
+    'WebSearchClient',
+    'WebSearchResult',
+    'TavilyClient',
+    'WebSearchConfig', 
+    'APIRateLimiter',
+    'SearchRequestBuilder'
 ]

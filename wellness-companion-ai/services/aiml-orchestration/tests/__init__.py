@@ -14,6 +14,7 @@ from .test_rag_pipeline import TestRAGPipeline
 from .test_embeddings import TestEmbeddings
 from .test_vector_search import TestVectorSearch
 from .test_orchestrator import TestOrchestrators
+from .test_confidence_scoring import TestConfidenceScoring
 
 __version__ = "1.0.0"
 

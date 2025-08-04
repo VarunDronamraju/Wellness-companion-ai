@@ -1,0 +1,19 @@
+{
+  "queries": [
+    {
+      "query": "latest AI breakthroughs 2025",
+      "expected_fallback": true,
+      "reason": "current_information_needed"
+    },
+    {
+      "query": "recent machine learning papers",
+      "expected_fallback": true,
+      "reason": "temporal_relevance"
+    },
+    {
+      "query": "unknown technical term xyz",
+      "expected_fallback": true,
+      "reason": "knowledge_gap"
+    }
+  ]
+}

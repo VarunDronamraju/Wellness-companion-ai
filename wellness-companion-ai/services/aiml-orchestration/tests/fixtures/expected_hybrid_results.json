@@ -1,0 +1,41 @@
+{
+  "hybrid_result_structure": {
+    "query": "machine learning algorithms",
+    "content": "Combined content from local and web sources",
+    "sources": [
+      {
+        "type": "local",
+        "title": "ML Algorithms Guide"
+      },
+      {
+        "type": "web",
+        "title": "Latest ML Developments",
+        "url": "https://example.com/ml-latest"
+      }
+    ],
+    "metadata": {
+      "total_sources": 2,
+      "local_sources": 1,
+      "web_sources": 1,
+      "confidence_score": 0.85,
+      "response_type": "hybrid"
+    }
+  },
+  "vector_only_result": {
+    "query": "basic machine learning definition",
+    "content": "Content from local knowledge base only",
+    "sources": [
+      {
+        "type": "local",
+        "title": "ML Fundamentals"
+      }
+    ],
+    "metadata": {
+      "total_sources": 1,
+      "local_sources": 1,
+      "web_sources": 0,
+      "confidence_score": 0.95,
+      "response_type": "vector_only"
+    }
+  }
+}

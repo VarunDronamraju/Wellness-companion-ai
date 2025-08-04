@@ -1,0 +1,19 @@
+{
+  "queries": [
+    {
+      "query": "what is machine learning",
+      "expected_fallback": false,
+      "reason": "well_established_knowledge"
+    },
+    {
+      "query": "linear regression algorithm",
+      "expected_fallback": false,
+      "reason": "fundamental_concept"
+    },
+    {
+      "query": "supervised learning definition",
+      "expected_fallback": false,
+      "reason": "basic_ml_knowledge"
+    }
+  ]
+}
