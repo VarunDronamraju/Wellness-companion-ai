@@ -15,11 +15,11 @@ from unittest.mock import Mock, patch, AsyncMock
 # Add src to path
 sys.path.append('/app/src')
 
-from orchestrators.rag_orchestrator import RAGOrchestrator, RAGResult
-from orchestrators.retrieval_orchestrator import RetrievalOrchestrator
-from orchestrators.response_synthesizer import ResponseSynthesizer
-from orchestrators.context_builder import AssembledContext
-from orchestrators.query_processor import QueryAnalysis
+from src.orchestrators.rag_orchestrator import RAGOrchestrator, RAGResult
+from src.orchestrators.retrieval_orchestrator import RetrievalOrchestrator
+from src.orchestrators.response_synthesizer import ResponseSynthesizer
+from src.orchestrators.context_builder import AssembledContext
+from src.orchestrators.query_processor import QueryAnalysis
 
 class TestRAGPipeline(unittest.TestCase):
     """Test complete RAG pipeline functionality."""
