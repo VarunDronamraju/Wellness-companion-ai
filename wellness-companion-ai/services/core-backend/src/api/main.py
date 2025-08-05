@@ -17,6 +17,9 @@ import os
 # Import the health router
 from .endpoints.system.health import router as health_router
 from .endpoints.search.hybrid_search import router as search_router
+from .endpoints.documents.list import router as document_list_router
+
+
 
 # SIMPLE: Direct import of document upload
 try:
@@ -119,8 +122,9 @@ app.include_router(health_router, prefix="/api/system", tags=["system"])
 app.include_router(search_router, prefix="/api/search", tags=["search"])
 
 if DOCUMENT_ROUTER_AVAILABLE:
-    app.include_router(document_router, prefix="/api/documents", tags=["documents"])
-    logger.info("✅ Document router registered")
+    app.include_router(document_router, prefix="/api/documents", tags=["documents"]) 
+    app.include_router(document_list_router, prefix="/api/documents", tags=["documents"])  # NEW
+    logger.info("✅ Document routers registered")
 
 if __name__ == "__main__":
     import uvicorn
