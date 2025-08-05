@@ -1,135 +1,114 @@
 """
 Core Backend Main Application - Wellness Companion AI
-C:\Users\varun\Desktop\JObSearch\Application\WellnessAtWorkAI\wellness-companion-ai\services\core-backend\src\api\main.py
 FastAPI application instance and basic endpoints
 """
 
-from fastapi import FastAPI, Depends
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import logging
+import os
 
-from .app_factory import create_application
-from .router import router as api_router
-from ..core.dependencies import get_current_settings, get_service_config, log_request_info
-from ..core.config import config
-
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create FastAPI application using factory
-app = create_application()
+# Create FastAPI application
+app = FastAPI(
+    title="Wellness Companion AI - Core Backend",
+    description="Core Backend Service for API gateway, authentication, and service orchestration",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
 
-# Include main API router
-app.include_router(api_router)
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Will be configured properly later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# Global variables for service status
+SERVICE_STATUS = {
+    "status": "starting",
+    "started_at": datetime.utcnow().isoformat(),
+    "version": "1.0.0",
+    "environment": os.getenv("ENVIRONMENT", "development")
+}
 
-# === ROOT ENDPOINTS ===
+@app.on_event("startup")
+async def startup_event():
+    """Initialize service on startup"""
+    logger.info("🚀 Starting Core Backend Service...")
+    
+    # Update service status
+    SERVICE_STATUS["status"] = "healthy"
+    SERVICE_STATUS["ready_at"] = datetime.utcnow().isoformat()
+    
+    logger.info("✅ Core Backend Service started successfully")
 
-@app.get("/", tags=["root"])
-async def root(
-    request_info: dict = Depends(log_request_info),
-    service_config = Depends(get_service_config)
-):
-    """Root endpoint with service information"""
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown"""
+    logger.info("🔄 Shutting down Core Backend Service...")
+    SERVICE_STATUS["status"] = "shutting_down"
+
+@app.get("/")
+async def root():
+    """Root endpoint"""
     return {
-        "service": service_config.SERVICE_NAME,
-        "version": service_config.VERSION,
-        "environment": service_config.ENVIRONMENT,
+        "service": "Core Backend Service",
         "status": "running",
-        "message": "Wellness Companion AI - Core Backend Service",
-        "timestamp": datetime.utcnow().isoformat(),
-        "request_id": request_info["request_id"],
-        "documentation": {
-            "swagger_ui": "/docs" if service_config.DOCS_URL else "disabled",
-            "redoc": "/redoc" if service_config.REDOC_URL else "disabled"
-        }
+        "message": "Wellness Companion AI - Core Backend",
+        "timestamp": datetime.utcnow().isoformat()
     }
 
-
-@app.get("/ping", tags=["health"])
+@app.get("/ping")
 async def ping():
-    """Simple ping endpoint for uptime monitoring"""
-    return {
-        "message": "pong",
+    """Simple ping endpoint"""
+    return {"message": "pong", "timestamp": datetime.utcnow().isoformat()}
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Docker and monitoring"""
+    
+    # Basic health checks
+    health_status = {
+        "status": SERVICE_STATUS["status"],
         "timestamp": datetime.utcnow().isoformat(),
-        "service": config.SERVICE_NAME
+        "service": "core-backend",
+        "version": SERVICE_STATUS["version"],
+        "uptime_started": SERVICE_STATUS["started_at"]
     }
+    
+    return health_status
 
-
-@app.get("/version", tags=["system"])
-async def get_version():
-    """Get service version information"""
+@app.get("/api/status")
+async def get_status():
+    """Detailed status endpoint"""
     return {
-        "service": config.SERVICE_NAME,
-        "version": config.VERSION,
-        "environment": config.ENVIRONMENT,
-        "build_info": {
-            "python_version": "3.11+",
-            "fastapi_version": "0.104.1+",
-            "framework": "FastAPI"
-        }
-    }
-
-
-# === PLACEHOLDER ENDPOINTS (will be replaced in subsequent tasks) ===
-
-@app.get("/api/status", tags=["system"])
-async def get_detailed_status(settings = Depends(get_current_settings)):
-    """Detailed service status - enhanced in Task 38"""
-    return {
-        "service_info": config.get_service_info(),
+        "service_info": SERVICE_STATUS,
         "environment": {
-            "aiml_service_url": settings.aiml_service_url,
-            "data_layer_url": settings.data_layer_url,
-            "redis_configured": bool(settings.redis_url),
-            "jwt_configured": bool(settings.jwt_secret_key),
-            "google_oauth_configured": bool(settings.google_client_id),
-            "aws_cognito_configured": bool(settings.aws_cognito_user_pool_id)
+            "aiml_service_url": os.getenv("AIML_SERVICE_URL", "http://aiml-orchestration:8000"),
+            "data_layer_url": os.getenv("DATA_LAYER_URL", "http://data-layer:8000"),
+            "redis_configured": bool(os.getenv("REDIS_URL")),
         },
-        "external_services": config.get_external_service_urls(),
         "capabilities": [
-            "api_gateway",
-            "service_orchestration", 
-            "request_validation",
-            "cors_handling"
-        ],
-        "planned_features": [
-            "health_monitoring (Task 38)",
-            "authentication (Phase 6)",
-            "document_management (Tasks 40-43)",
-            "search_orchestration (Tasks 39, 44-45)",
-            "rate_limiting (Task 73)"
+            "health_monitoring",
+            "service_discovery",
+            "api_gateway"
         ],
         "timestamp": datetime.utcnow().isoformat()
     }
 
-
-# === DEVELOPMENT HELPER ENDPOINTS ===
-
-@app.get("/api/config", tags=["system"])
-async def get_configuration(settings = Depends(get_current_settings)):
-    """Get current configuration (development only)"""
-    if config.ENVIRONMENT == "production":
-        return JSONResponse(
-            status_code=403,
-            content={"error": "Configuration endpoint disabled in production"}
-        )
-    
-    return {
-        "cors_origins": settings.cors_origins,
-        "debug_mode": settings.debug,
-        "external_services": config.get_external_service_urls(),
-        "api_prefix": settings.api_v1_prefix,
-        "max_upload_size": settings.max_upload_size,
-        "log_level": settings.log_level
-    }
-
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "src.api.main:app",
+        "main:app",
         host="0.0.0.0",
-        port=8001,  # Fixed: Use port 8001
+        port=8001,
         reload=True
     )

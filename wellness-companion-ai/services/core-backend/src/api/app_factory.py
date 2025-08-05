@@ -10,9 +10,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 import logging.config
 from datetime import datetime
 from typing import Optional
-
-from ..core.config import config, CoreBackendConfig
-from ..core.settings import settings
+from src.integrations import close_aiml_client
+from src.core.config import config, CoreBackendConfig
+from src.core.settings import settings
 from .middleware.cors_middleware import setup_cors, validate_cors_config
 
 logger = logging.getLogger(__name__)
@@ -146,18 +146,27 @@ def setup_event_handlers(app: FastAPI) -> None:
         
         logger.info("✅ Core Backend service startup completed")
     
+
     @app.on_event("shutdown")
     async def shutdown_event():
         """Application shutdown event"""
         logger.info("🔄 Core Backend service shutting down...")
         
-        # Cleanup operations would go here
-        # - Close database connections
-        # - Close HTTP client sessions
-        # - Flush logs
-        
-        logger.info("✅ Core Backend service shutdown completed")
-
+        # Cleanup operations
+        try:
+            # Close AI/ML service client
+            await close_aiml_client()
+            logger.info("✅ AI/ML service client closed")
+            
+            # Additional cleanup operations would go here
+            # - Close database connections
+            # - Close other HTTP client sessions
+            # - Flush logs
+            
+        except Exception as e:
+            logger.error(f"Error during shutdown cleanup: {e}")
+    
+    logger.info("✅ Core Backend service shutdown completed")
 
 # Application instance
 def get_application() -> FastAPI:

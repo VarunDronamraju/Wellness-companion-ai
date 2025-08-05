@@ -1,6 +1,4 @@
-# services/core-backend/Dockerfile
 # Core Backend Service Container for Wellness Companion AI
-
 FROM python:3.11-slim
 
 # Set working directory
@@ -26,6 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code
 COPY src/ ./src/
+COPY main.py ./
 
 # Create necessary directories
 RUN mkdir -p /app/logs /app/uploads /app/cache
@@ -35,10 +34,10 @@ RUN chmod -R 755 /app
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:8001/ping || exit 1
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8001
 
-# Start the application
-CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start the application - FIXED
+CMD ["python", "main.py"]

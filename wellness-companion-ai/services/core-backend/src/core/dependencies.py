@@ -5,7 +5,7 @@ FastAPI dependency injection functions
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from typing import Optional, Generator
+from typing import Optional, Dict
 import logging
 from .settings import settings
 from .config import config
@@ -82,12 +82,20 @@ async def check_rate_limit(
     return True
 
 
-# Service client dependencies (Task 37)
-async def get_aiml_client():
-    """Get AI/ML service client - Task 37 implementation"""
-    # This will be implemented in Task 37
-    logger.info("AI/ML client dependency - Task 37 implementation")
-    return None
+# AI/ML Client dependency (Task 37)
+async def get_aiml_client_dependency():
+    """Get AI/ML service client dependency"""
+    try:
+        # Import here to avoid circular imports
+        from ..integrations import get_aiml_client
+        client = await get_aiml_client()
+        return client
+    except Exception as e:
+        logger.error(f"Failed to get AI/ML client: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail="AI/ML service unavailable"
+        )
 
 
 async def get_data_client():
