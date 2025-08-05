@@ -1,8 +1,4 @@
 
-# ========================================
-# services/core-backend/src/api/main.py - SIMPLE DOCUMENT IMPORT
-# ========================================
-
 """
 Core Backend Main Application - Wellness Companion AI
 FastAPI application instance and basic endpoints
@@ -17,16 +13,15 @@ import os
 # Import the health router
 from .endpoints.system.health import router as health_router
 from .endpoints.search.hybrid_search import router as search_router
-from .endpoints.documents.list import router as document_list_router
 
-
-
-# SIMPLE: Direct import of document upload
+# IMPORT ALL DOCUMENT ROUTERS
 try:
-    from .endpoints.documents.upload import router as document_router
+    from .endpoints.documents.upload import router as document_upload_router
+    from .endpoints.documents.list import router as document_list_router
+    from .endpoints.documents.details import router as document_details_router  # NEW
     DOCUMENT_ROUTER_AVAILABLE = True
     logger = logging.getLogger(__name__)
-    logger.info("✅ Simple document router imported")
+    logger.info("✅ All document routers imported successfully")
 except Exception as e:
     DOCUMENT_ROUTER_AVAILABLE = False
     logger = logging.getLogger(__name__)
@@ -103,7 +98,7 @@ async def health_check():
 async def get_status():
     capabilities = ["health_monitoring", "service_discovery", "api_gateway"]
     if DOCUMENT_ROUTER_AVAILABLE:
-        capabilities.append("document_management")
+        capabilities.extend(["document_management", "document_upload", "document_listing", "document_details"])  # UPDATED
     
     return {
         "service_info": SERVICE_STATUS,
@@ -121,10 +116,14 @@ async def get_status():
 app.include_router(health_router, prefix="/api/system", tags=["system"])
 app.include_router(search_router, prefix="/api/search", tags=["search"])
 
+# REGISTER ALL DOCUMENT ROUTERS
 if DOCUMENT_ROUTER_AVAILABLE:
-    app.include_router(document_router, prefix="/api/documents", tags=["documents"]) 
-    app.include_router(document_list_router, prefix="/api/documents", tags=["documents"])  # NEW
-    logger.info("✅ Document routers registered")
+    app.include_router(document_upload_router, prefix="/api/documents", tags=["documents"])
+    app.include_router(document_list_router, prefix="/api/documents", tags=["documents"])
+    app.include_router(document_details_router, prefix="/api/documents", tags=["documents"])  # NEW
+    logger.info("✅ All document routers registered successfully")
+else:
+    logger.warning("⚠️ Document routers not available")
 
 if __name__ == "__main__":
     import uvicorn

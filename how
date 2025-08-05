@@ -1,8 +1,0 @@
-* [33mfbf30de[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m � Phase 3: Search layer added but buggy — pushing as v0.35
-* [33mdc181c0[m[33m ([m[1;33mtag: [m[1;33mv0.31[m[33m, [m[1;33mtag: [m[1;33mv0.30[m[33m, [m[1;32mv0.30-branch[m[33m, [m[1;32mphase3-rebuild[m[33m)[m ✅ Completed Task 30: Core RAG Pipeline functional - v0.30
-* [33mc06d539[m[33m ([m[1;33mtag: [m[1;33mv0.22[m[33m)[m ✅ Task 22 Complete: Vector Storage integration with Qdrant, collection init & stats operations
-* [33m07a85c2[m[33m ([m[1;33mtag: [m[1;33mv0.20[m[33m)[m � v0.20 — Task 20 Complete: Qdrant VectorDB Fully Integrated
-* [33m44ecb66[m[33m ([m[1;33mtag: [m[1;33mv0.18[m[33m)[m  v0.18 - Add TextSplitter, DocumentProcessor, fix Docker deps
-* [33m3b46b77[m[33m ([m[1;33mtag: [m[1;33mv0.15[m[33m)[m Release v0.15: Fixed ollama configuration, switched postgres to pgvector, updated qdrant health check, disabled nginx and desktop-app, added gitignore and line ending configs
-* [33me6e7df0[m[33m ([m[1;33mtag: [m[1;33mphase0.03[m[33m)[m Phase0.3: Add full project structure for wellness-companion-ai
-* [33medfcb34[m first commit

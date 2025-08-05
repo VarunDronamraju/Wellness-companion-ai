@@ -13,7 +13,7 @@ from typing import Optional
 import logging
 import os
 import glob
-from datetime import datetime
+from datetime import datetime, timedelta  
 
 from .pagination import PaginationHelper
 from .filtering import DocumentFilter
