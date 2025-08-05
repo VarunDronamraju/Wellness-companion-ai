@@ -1,3 +1,6 @@
+# ========================================
+# services/core-backend/src/api/main.py - UPDATED WITH WEB SEARCH
+# ========================================
 
 """
 Core Backend Main Application - Wellness Companion AI
@@ -14,12 +17,14 @@ import os
 from .endpoints.system.health import router as health_router
 from .endpoints.search.hybrid_search import router as search_router
 from .endpoints.search.semantic_search import router as semantic_search_router
+from .endpoints.search.web_search import router as web_search_router  # NEW
+
 # IMPORT ALL DOCUMENT ROUTERS
 try:
     from .endpoints.documents.upload import router as document_upload_router
     from .endpoints.documents.list import router as document_list_router
     from .endpoints.documents.details import router as document_details_router
-    from .endpoints.documents.delete import router as document_delete_router  # NEW
+    from .endpoints.documents.delete import router as document_delete_router
     DOCUMENT_ROUTER_AVAILABLE = True
     logger = logging.getLogger(__name__)
     logger.info("✅ All document routers imported successfully")
@@ -97,9 +102,20 @@ async def health_check():
 
 @app.get("/api/status")
 async def get_status():
-    capabilities = ["health_monitoring", "service_discovery", "api_gateway"]
+    capabilities = [
+        "health_monitoring", 
+        "service_discovery", 
+        "api_gateway",
+        "web_search"  # NEW CAPABILITY
+    ]
     if DOCUMENT_ROUTER_AVAILABLE:
-        capabilities.extend(["document_management", "document_upload", "document_listing", "document_details"])  # UPDATED
+        capabilities.extend([
+            "document_management", 
+            "document_upload", 
+            "document_listing", 
+            "document_details",
+            "semantic_search"
+        ])
     
     return {
         "service_info": SERVICE_STATUS,
@@ -110,6 +126,7 @@ async def get_status():
         },
         "capabilities": capabilities,
         "document_router_available": DOCUMENT_ROUTER_AVAILABLE,
+        "web_search_available": True,  # NEW
         "timestamp": datetime.utcnow().isoformat()
     }
 
@@ -127,6 +144,10 @@ if DOCUMENT_ROUTER_AVAILABLE:
     logger.info("✅ All document routers registered successfully")
 else:
     logger.warning("⚠️ Document routers not available")
+
+# REGISTER WEB SEARCH ROUTER - NEW
+app.include_router(web_search_router, prefix="/api/search", tags=["search"])
+logger.info("✅ Web search router registered successfully")
 
 if __name__ == "__main__":
     import uvicorn
