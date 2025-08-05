@@ -9,6 +9,9 @@ from datetime import datetime
 import logging
 import os
 
+# Import the health router
+from .endpoints.system.health import router as health_router
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,6 +33,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include the health router
+app.include_router(health_router, prefix="/api/system", tags=["system"])
 
 # Global variables for service status
 SERVICE_STATUS = {

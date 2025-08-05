@@ -2,12 +2,14 @@
 API Router - Wellness Companion AI
 Main router registration for all API endpoints
 """
-
 from fastapi import APIRouter
-from ..core.config import config
+from src.core.settings import settings
+
+# Import routers
+from .endpoints.system.health import router as health_router
 
 # Create main API router
-api_router = APIRouter(prefix=config.settings.api_v1_prefix)
+api_router = APIRouter(prefix=settings.api_v1_prefix)
 
 # Import routers from different modules (will be implemented in subsequent tasks)
 # from .endpoints.auth.router import router as auth_router          # Task 70 (Phase 6)
@@ -17,7 +19,8 @@ api_router = APIRouter(prefix=config.settings.api_v1_prefix)
 
 def setup_routers() -> APIRouter:
     """Setup and register all API routers"""
-    
+    api_router.include_router(health_router, prefix="/system", tags=["system"])
+
     # Register routers (will be uncommented as tasks are completed)
     # api_router.include_router(system_router, tags=["system"])           # Task 38
     # api_router.include_router(auth_router, tags=["auth"])               # Phase 6
