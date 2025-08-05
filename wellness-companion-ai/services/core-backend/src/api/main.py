@@ -11,6 +11,7 @@ import os
 
 # Import the health router
 from .endpoints.system.health import router as health_router
+from .endpoints.search.hybrid_search import router as search_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,8 +36,6 @@ app.add_middleware(
 )
 
 # Include the health router
-app.include_router(health_router, prefix="/api/system", tags=["system"])
-
 # Global variables for service status
 SERVICE_STATUS = {
     "status": "starting",
@@ -109,6 +108,8 @@ async def get_status():
         ],
         "timestamp": datetime.utcnow().isoformat()
     }
+app.include_router(health_router, prefix="/api/system", tags=["system"])
+app.include_router(search_router, prefix="/api/search", tags=["search"])
 
 if __name__ == "__main__":
     import uvicorn
