@@ -18,7 +18,8 @@ from .endpoints.search.hybrid_search import router as search_router
 try:
     from .endpoints.documents.upload import router as document_upload_router
     from .endpoints.documents.list import router as document_list_router
-    from .endpoints.documents.details import router as document_details_router  # NEW
+    from .endpoints.documents.details import router as document_details_router
+    from .endpoints.documents.delete import router as document_delete_router  # NEW
     DOCUMENT_ROUTER_AVAILABLE = True
     logger = logging.getLogger(__name__)
     logger.info("✅ All document routers imported successfully")
@@ -120,7 +121,8 @@ app.include_router(search_router, prefix="/api/search", tags=["search"])
 if DOCUMENT_ROUTER_AVAILABLE:
     app.include_router(document_upload_router, prefix="/api/documents", tags=["documents"])
     app.include_router(document_list_router, prefix="/api/documents", tags=["documents"])
-    app.include_router(document_details_router, prefix="/api/documents", tags=["documents"])  # NEW
+    app.include_router(document_details_router, prefix="/api/documents", tags=["documents"])
+    app.include_router(document_delete_router, prefix="/api/documents", tags=["documents"])  # NEW
     logger.info("✅ All document routers registered successfully")
 else:
     logger.warning("⚠️ Document routers not available")
