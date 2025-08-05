@@ -171,3 +171,4 @@ class DocumentService:
         except Exception as e:
             logger.error(f"Failed to get service stats: {e}")
             return {"error": str(e)}
+    
