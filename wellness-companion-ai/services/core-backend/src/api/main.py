@@ -1,3 +1,8 @@
+
+# ========================================
+# services/core-backend/src/api/main.py - SIMPLE DOCUMENT IMPORT
+# ========================================
+
 """
 Core Backend Main Application - Wellness Companion AI
 FastAPI application instance and basic endpoints
@@ -12,6 +17,17 @@ import os
 # Import the health router
 from .endpoints.system.health import router as health_router
 from .endpoints.search.hybrid_search import router as search_router
+
+# SIMPLE: Direct import of document upload
+try:
+    from .endpoints.documents.upload import router as document_router
+    DOCUMENT_ROUTER_AVAILABLE = True
+    logger = logging.getLogger(__name__)
+    logger.info("✅ Simple document router imported")
+except Exception as e:
+    DOCUMENT_ROUTER_AVAILABLE = False
+    logger = logging.getLogger(__name__)
+    logger.error(f"❌ Document router failed: {e}")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,13 +45,12 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Will be configured properly later
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include the health router
 # Global variables for service status
 SERVICE_STATUS = {
     "status": "starting",
@@ -48,14 +63,11 @@ SERVICE_STATUS = {
 async def startup_event():
     """Initialize service on startup"""
     logger.info("🚀 Starting Core Backend Service...")
-    
-    # Update service status
     SERVICE_STATUS["status"] = "healthy"
     SERVICE_STATUS["ready_at"] = datetime.utcnow().isoformat()
-    
     logger.info("✅ Core Backend Service started successfully")
 
-@app.on_event("shutdown")
+@app.on_event("shutdown")  
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("🔄 Shutting down Core Backend Service...")
@@ -63,7 +75,6 @@ async def shutdown_event():
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
     return {
         "service": "Core Backend Service",
         "status": "running",
@@ -73,27 +84,24 @@ async def root():
 
 @app.get("/ping")
 async def ping():
-    """Simple ping endpoint"""
     return {"message": "pong", "timestamp": datetime.utcnow().isoformat()}
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint for Docker and monitoring"""
-    
-    # Basic health checks
-    health_status = {
+    return {
         "status": SERVICE_STATUS["status"],
         "timestamp": datetime.utcnow().isoformat(),
         "service": "core-backend",
         "version": SERVICE_STATUS["version"],
         "uptime_started": SERVICE_STATUS["started_at"]
     }
-    
-    return health_status
 
 @app.get("/api/status")
 async def get_status():
-    """Detailed status endpoint"""
+    capabilities = ["health_monitoring", "service_discovery", "api_gateway"]
+    if DOCUMENT_ROUTER_AVAILABLE:
+        capabilities.append("document_management")
+    
     return {
         "service_info": SERVICE_STATUS,
         "environment": {
@@ -101,21 +109,19 @@ async def get_status():
             "data_layer_url": os.getenv("DATA_LAYER_URL", "http://data-layer:8000"),
             "redis_configured": bool(os.getenv("REDIS_URL")),
         },
-        "capabilities": [
-            "health_monitoring",
-            "service_discovery",
-            "api_gateway"
-        ],
+        "capabilities": capabilities,
+        "document_router_available": DOCUMENT_ROUTER_AVAILABLE,
         "timestamp": datetime.utcnow().isoformat()
     }
+
+# Include routers
 app.include_router(health_router, prefix="/api/system", tags=["system"])
 app.include_router(search_router, prefix="/api/search", tags=["search"])
 
+if DOCUMENT_ROUTER_AVAILABLE:
+    app.include_router(document_router, prefix="/api/documents", tags=["documents"])
+    logger.info("✅ Document router registered")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8001,
-        reload=True
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
