@@ -1,3 +1,7 @@
+# ========================================
+# services/core-backend/src/core/settings.py - COMPLETE FIX
+# ========================================
+
 """
 Core Backend Settings - Wellness Companion AI
 Environment-based configuration with validation
@@ -20,13 +24,12 @@ class CoreBackendSettings(BaseSettings):
     
     # === NETWORK CONFIGURATION ===
     host: str = Field(default="0.0.0.0", env="CORE_BACKEND_HOST")
-    port: int = Field(default=8001, env="CORE_BACKEND_PORT")  # Fixed: Use 8001
+    port: int = Field(default=8001, env="CORE_BACKEND_PORT")
     
-    # === SECURITY CONFIGURATION ===
-    cors_origins: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:8080"], 
-        env="CORS_ORIGINS"
-    )
+    # === SECURITY CONFIGURATION === 
+    # FIXED: Use string with default values that work
+    cors_origins: str = Field(default="*", env="CORS_ORIGINS")
+    cors_methods: str = Field(default="GET,POST,PUT,DELETE,OPTIONS", env="CORS_METHODS")
     cors_credentials: bool = Field(default=True, env="CORS_CREDENTIALS")
     
     # === EXTERNAL SERVICES ===
@@ -54,15 +57,12 @@ class CoreBackendSettings(BaseSettings):
     api_v1_prefix: str = "/api"
     max_upload_size: int = Field(default=10485760, env="MAX_UPLOAD_SIZE")  # 10MB
     
+    # === FILE CONFIGURATION ===
+    # FIXED: Use string instead of List
+    allowed_file_types: str = Field(default="pdf,docx,txt,md", env="ALLOWED_FILE_TYPES")
+    
     # === LOGGING ===
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
-    
-    @validator('cors_origins', pre=True)
-    def parse_cors_origins(cls, v):
-        """Parse CORS origins from string or list"""
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(',')]
-        return v
     
     @validator('environment')
     def validate_environment(cls, v):
@@ -72,10 +72,42 @@ class CoreBackendSettings(BaseSettings):
             raise ValueError(f'Environment must be one of: {allowed}')
         return v.lower()
     
+    # === HELPER PROPERTIES ===
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Get CORS origins as list"""
+        if self.cors_origins == "*":
+            return ["*"]
+        return [origin.strip() for origin in self.cors_origins.split(',') if origin.strip()]
+    
+    @property
+    def cors_methods_list(self) -> List[str]:
+        """Get CORS methods as list"""
+        return [method.strip() for method in self.cors_methods.split(',') if method.strip()]
+    
+    @property
+    def allowed_file_types_list(self) -> List[str]:
+        """Get allowed file types as list"""
+        return [file_type.strip() for file_type in self.allowed_file_types.split(',') if file_type.strip()]
+    
     class Config:
         env_file = ".env"
         case_sensitive = False
 
 
-# Global settings instance
-settings = CoreBackendSettings()
+# Global settings instance with error handling
+try:
+    settings = CoreBackendSettings()
+    print(f"✅ Settings loaded successfully: {settings.service_name} v{settings.version}")
+    print(f"📍 Environment: {settings.environment}")
+    print(f"🌐 CORS Origins: {settings.cors_origins_list}")
+    print(f"📁 File Types: {settings.allowed_file_types_list}")
+except Exception as e:
+    print(f"❌ Failed to load settings: {e}")
+    # Create minimal fallback settings
+    settings = CoreBackendSettings(
+        cors_origins="*",
+        cors_methods="GET,POST,PUT,DELETE,OPTIONS",
+        allowed_file_types="pdf,docx,txt,md"
+    )
+    print("🔄 Using fallback settings")

@@ -13,7 +13,7 @@ import os
 # Import the health router
 from .endpoints.system.health import router as health_router
 from .endpoints.search.hybrid_search import router as search_router
-
+from .endpoints.search.semantic_search import router as semantic_search_router
 # IMPORT ALL DOCUMENT ROUTERS
 try:
     from .endpoints.documents.upload import router as document_upload_router
@@ -122,7 +122,8 @@ if DOCUMENT_ROUTER_AVAILABLE:
     app.include_router(document_upload_router, prefix="/api/documents", tags=["documents"])
     app.include_router(document_list_router, prefix="/api/documents", tags=["documents"])
     app.include_router(document_details_router, prefix="/api/documents", tags=["documents"])
-    app.include_router(document_delete_router, prefix="/api/documents", tags=["documents"])  # NEW
+    app.include_router(document_delete_router, prefix="/api/documents", tags=["documents"])  
+    app.include_router(semantic_search_router, prefix="/api/search", tags=["search"])
     logger.info("✅ All document routers registered successfully")
 else:
     logger.warning("⚠️ Document routers not available")
