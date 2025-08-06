@@ -1,34 +1,43 @@
 # ========================================
-# services/core-backend/requirements.txt - UPDATED
+# services/core-backend/requirements.txt - FINAL
 # ========================================
 
 # FastAPI and ASGI
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
 
 # Request/Response handling
-pydantic==2.5.0
-pydantic-settings==2.1.0
-python-multipart==0.0.6
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-multipart>=0.0.6
 
 # HTTP client for service communication
-httpx==0.25.2
+httpx>=0.24.0
 aiofiles==23.2.1
 
 # Redis for caching and rate limiting
-redis==5.0.1
+redis>=4.5.0
+
+# Database and caching
+asyncpg>=0.28.0
+
+# Async support
+asyncio-mqtt>=0.11.0
+
+# Environment and configuration
+python-dotenv>=1.0.0
 
 # Authentication (for future phases)
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 
 # File handling and validation
-python-magic==0.4.27
+python-magic>=0.4.27
 
 # Logging and monitoring
-structlog==23.2.0
+structlog>=23.1.0
 
 # Development and testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
 pytest-httpx==0.26.0

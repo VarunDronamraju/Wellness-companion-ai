@@ -8,9 +8,9 @@ Middleware Package - FastAPI middleware components
 Provides error handling, CORS, rate limiting, and request processing
 """
 
-from .error_handler import GlobalErrorHandler, setup_error_handling, HealthCheckErrorHandler
-from .exception_mapper import ExceptionMapper, exception_mapper, create_error_response
-from .error_responses import (
+from src.api.middleware.error_handler import GlobalErrorHandler, setup_error_handling, HealthCheckErrorHandler
+from src.api.middleware.exception_mapper import ExceptionMapper, exception_mapper, create_error_response
+from src.api.middleware.error_responses import (
     StandardErrorResponse,
     ValidationErrorResponse,
     ServiceErrorResponse,

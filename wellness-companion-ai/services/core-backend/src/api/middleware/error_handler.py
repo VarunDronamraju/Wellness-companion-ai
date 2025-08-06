@@ -20,9 +20,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import ValidationError
 import asyncio
 
-from .exception_mapper import exception_mapper, create_error_response
-from .error_responses import create_standard_error
-from ...core.exceptions import (
+from src.api.middleware.exception_mapper import exception_mapper, create_error_response
+from src.api.middleware.error_responses import create_standard_error
+from src.core.exceptions import (
     WellnessCompanionException,
     SystemError,
     MaintenanceModeError,

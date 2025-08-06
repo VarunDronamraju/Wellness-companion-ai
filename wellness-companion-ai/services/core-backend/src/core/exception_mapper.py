@@ -17,7 +17,7 @@ from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from ...core.exceptions import (
+from src.core.exceptions import (
     WellnessCompanionException,
     AuthenticationError,
     AuthorizationError,
@@ -32,7 +32,6 @@ from ...core.exceptions import (
     handle_pydantic_validation_error,
     log_exception
 )
-
 logger = logging.getLogger(__name__)
 
 
