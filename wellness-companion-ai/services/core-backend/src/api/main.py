@@ -1,10 +1,10 @@
 # ========================================
-# services/core-backend/src/api/main.py - UPDATED WITH WEB SEARCH
+# services/core-backend/src/api/main.py - UPDATED WITH ERROR HANDLING
 # ========================================
 
 """
 Core Backend Main Application - Wellness Companion AI
-FastAPI application instance and basic endpoints
+FastAPI application with comprehensive error handling middleware
 """
 
 from fastapi import FastAPI
@@ -13,11 +13,14 @@ from datetime import datetime
 import logging
 import os
 
+# Import error handling middleware
+from .middleware import setup_error_handling
+
 # Import the health router
 from .endpoints.system.health import router as health_router
 from .endpoints.search.hybrid_search import router as search_router
 from .endpoints.search.semantic_search import router as semantic_search_router
-from .endpoints.search.web_search import router as web_search_router  # NEW
+from .endpoints.search.web_search import router as web_search_router
 
 # IMPORT ALL DOCUMENT ROUTERS
 try:
@@ -46,7 +49,11 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS middleware
+# SETUP ERROR HANDLING MIDDLEWARE FIRST (before other middleware)
+debug_mode = os.getenv("DEBUG", "true").lower() == "true"
+setup_error_handling(app, debug=debug_mode)
+
+# CORS middleware (after error handling)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -70,6 +77,7 @@ async def startup_event():
     SERVICE_STATUS["status"] = "healthy"
     SERVICE_STATUS["ready_at"] = datetime.utcnow().isoformat()
     logger.info("✅ Core Backend Service started successfully")
+    logger.info("🛡️ Global error handling middleware active")
 
 @app.on_event("shutdown")  
 async def shutdown_event():
@@ -83,6 +91,7 @@ async def root():
         "service": "Core Backend Service",
         "status": "running",
         "message": "Wellness Companion AI - Core Backend",
+        "error_handling": "enabled",
         "timestamp": datetime.utcnow().isoformat()
     }
 
@@ -97,7 +106,8 @@ async def health_check():
         "timestamp": datetime.utcnow().isoformat(),
         "service": "core-backend",
         "version": SERVICE_STATUS["version"],
-        "uptime_started": SERVICE_STATUS["started_at"]
+        "uptime_started": SERVICE_STATUS["started_at"],
+        "error_handling": "active"
     }
 
 @app.get("/api/status")
@@ -106,7 +116,9 @@ async def get_status():
         "health_monitoring", 
         "service_discovery", 
         "api_gateway",
-        "web_search"  # NEW CAPABILITY
+        "web_search",
+        "error_handling",  # NEW CAPABILITY
+        "request_validation"  # NEW CAPABILITY
     ]
     if DOCUMENT_ROUTER_AVAILABLE:
         capabilities.extend([
@@ -123,10 +135,17 @@ async def get_status():
             "aiml_service_url": os.getenv("AIML_SERVICE_URL", "http://aiml-orchestration:8000"),
             "data_layer_url": os.getenv("DATA_LAYER_URL", "http://data-layer:8000"),
             "redis_configured": bool(os.getenv("REDIS_URL")),
+            "debug_mode": debug_mode,
         },
         "capabilities": capabilities,
         "document_router_available": DOCUMENT_ROUTER_AVAILABLE,
-        "web_search_available": True,  # NEW
+        "web_search_available": True,
+        "error_handling_active": True,  # NEW
+        "middleware": {
+            "error_handling": "active",
+            "cors": "active",
+            "validation": "active"
+        },
         "timestamp": datetime.utcnow().isoformat()
     }
 
@@ -145,9 +164,29 @@ if DOCUMENT_ROUTER_AVAILABLE:
 else:
     logger.warning("⚠️ Document routers not available")
 
-# REGISTER WEB SEARCH ROUTER - NEW
+# REGISTER WEB SEARCH ROUTER
 app.include_router(web_search_router, prefix="/api/search", tags=["search"])
 logger.info("✅ Web search router registered successfully")
+
+# Test error handling endpoints (development only)
+if debug_mode:
+    @app.get("/api/test/error/{error_type}")
+    async def test_error_handling(error_type: str):
+        """Test error handling middleware - DEVELOPMENT ONLY"""
+        
+        if error_type == "500":
+            raise Exception("Test 500 error")
+        elif error_type == "validation":
+            from pydantic import ValidationError
+            raise ValidationError("Test validation error", model=None)
+        elif error_type == "custom":
+            from ..core.exceptions import DocumentNotFoundError
+            raise DocumentNotFoundError("test_doc_123")
+        elif error_type == "timeout":
+            import asyncio
+            await asyncio.sleep(10)  # This will likely timeout
+        else:
+            return {"message": f"Unknown error type: {error_type}"}
 
 if __name__ == "__main__":
     import uvicorn
